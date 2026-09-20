@@ -1,0 +1,6 @@
+CREATE TABLE if NOT EXISTS page_views (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    visited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO page_views (visited_at) VALUES (DEFAULT);
