@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cloud services - assignment 3</title>
+    <title>cloud services - assignment 4</title>
     <style>
       body {
-        font-family: Arial, sans-serif;
+        font-family: "times new roman", serif;
         margin: 40px;
-        background: #f4f4f9;
+        background: #f9f5f4;
       }
       .card {
-        background: white;
+        background: rgb(231, 227, 222);
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -19,7 +19,7 @@
       }
       button {
         background: #a88a52;
-        color: white;
+        color: rgb(234, 230, 225);
         border: none;
         padding: 10px 15px;
         border-radius: 4px;
@@ -32,14 +32,14 @@
   </head>
   <body>
     <div class="card">
-      <h2>app dashboard</h2>
+      <h2>stats</h2>
       <p>
         <strong>MySQL server time:</strong> <span id="time">loading...</span>
       </p>
       <p>
         <strong>total page visits:</strong> <span id="visits">loading...</span>
       </p>
-      <button onclick="logVisit()">log new visit</button>
+      <button onclick="logVisit()">log new visit!</button>
     </div>
 
     <script>
@@ -47,7 +47,8 @@
         try {
           const res = await fetch("/api/data");
           const data = await res.json();
-          document.getElementById("time").innerText = data.serverTime;
+          const formattedTime = new Date(data.serverTime).toLocaleString();
+          document.getElementById("time").innerText = formattedTime;
           document.getElementById("visits").innerText = data.totalVisits;
         } catch (err) {
           console.error("Error fetching data:", err);
