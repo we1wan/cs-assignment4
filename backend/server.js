@@ -15,7 +15,7 @@ const db = mysql.createPool({
 });
 
 app.post("/api/visit", (req, res) => {
-  db.query("INSERT INTO page_views (visited_at) VALUES (DEFAULT)", (err) => {
+  db.query("INSERT INTO visits (visited_at) VALUES (DEFAULT)", (err) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: "visit logged!" });
   });
@@ -23,7 +23,7 @@ app.post("/api/visit", (req, res) => {
 
 app.get("/api/data", (req, res) => {
   db.query(
-    "SELECT NOW() AS serverTime, COUNT(*) AS totalVisits FROM page_views",
+    "SELECT NOW() AS serverTime, COUNT(*) AS totalVisits FROM visits",
     (err, results) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json(results[0]);
