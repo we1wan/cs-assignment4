@@ -3,13 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cloud services - assignment 4</title>
+    <title>assignment 4</title>
     <style>
       body {
-        font-family: "times new roman", serif;
+        font-family: "Times New Roman", Times, serif;
         margin: 40px;
-        background: #f9f5f4;
+        line-height: 1.6;
+        max-width: 800px;
       }
+
       .card {
         background: rgb(231, 227, 222);
         padding: 20px;
@@ -28,6 +30,13 @@
       button:hover {
         background: #a88a52bf;
       }
+
+      .diary {
+        background: #fff9f2;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+      }
     </style>
   </head>
   <body>
@@ -40,6 +49,81 @@
         <strong>total page visits:</strong> <span id="visits">loading...</span>
       </p>
       <button onclick="logVisit()">log new visit!</button>
+    </div>
+
+    <div class="diary" style="margin-top: 20px">
+      <h3>learning diary</h3>
+      <p>
+        this application is built using a multi-tier containerized architecture
+        deployed on the CSC Rahti platform
+      </p>
+      <p>
+        frontend uses nginx web server which is serving static HTML and
+        client-side javascript, listening on port 8080 and proxying API traffic
+      </p>
+      <p>
+        backend uses express.js REST API running on port 5000 with endpoints
+        <i>/api/data</i> and <i>/api/visit</i>
+      </p>
+      <p>
+        database uses MySQL relational database running on port 3306 storing
+        visit records in the visits table
+      </p>
+
+      <p>
+        all source code changes are tracked in github. rahti uses buildconfig
+        resources connected to the repository. triggering manual builds in the
+        rahti web console automatically takes the latest code, builds updated
+        docker images, and re-rolls the pods.
+      </p>
+
+      <p>
+        the internal communication between pods uses mainly kubernetes clusterip
+        services;
+      </p>
+      <p>backend-service > routes internal traffic to port 5000</p>
+      <p>mysql-service > routes internal traffic to port 3306</p>
+      <p>
+        nginx > takes incoming browser traffic to port 8080 and proxies backend
+        API requests internally
+      </p>
+    </div>
+
+    <div class="diary">
+      <img
+        src="https://github.com/we1wan/cs-assignment4/blob/main/img/a4-builds.png?raw=true"
+        alt="rahti builds"
+        style="
+          width: 100%;
+          border-radius: 6px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        "
+      />
+      <img
+        src="https://github.com/we1wan/cs-assignment4/blob/main/img/a4-rahti.png?raw=true"
+        style="
+          width: 100%;
+          border-radius: 6px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        "
+      />
+      <img
+        src="https://github.com/we1wan/cs-assignment4/blob/main/img/a4-rahtii.png?raw=true"
+        style="
+          width: 100%;
+          border-radius: 6px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        "
+      />
+      <img
+        src="https://github.com/we1wan/cs-assignment4/blob/main/img/a4-pods.png?raw=true"
+        alt="rahti pods"
+        style="
+          width: 100%;
+          border-radius: 6px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        "
+      />
     </div>
 
     <script>
