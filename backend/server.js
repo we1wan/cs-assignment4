@@ -7,8 +7,8 @@ app.use(express.json());
 
 const db = mysql.createPool({
   host: process.env.DB_HOST || "mysql-service",
-  user: process.env.MYSQL_USER || "appuser",
-  password: process.env.MYSQL_PASSWORD || "userpassword",
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE || "appdb",
   waitForConnections: true,
   connectionLimit: 10,
