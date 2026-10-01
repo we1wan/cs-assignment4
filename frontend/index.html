@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>assignment</title>
+    <style>
+      body {
+        font-family: "Times New Roman", Times, serif;
+        margin: 40px;
+        line-height: 1.6;
+        max-width: 800px;
+      }
+
+      .card {
+        background: rgb(231, 227, 222);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin-bottom: 20px;
+      }
+      button {
+        background: #a88a52;
+        color: rgb(234, 230, 225);
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #a88a52bf;
+      }
+
+      .diary {
+        background: #fff9f2;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class = "diary"> 
+      <h3>note !</h3>
+      <p>the page visits sometimes show zero and weather data may show error loading so pls just refresh the page! i'll try to fix it asap :)</p>
+    </div>
+    
+    <div class="card">
+      <h2>stats</h2>
+      <p>
+        <strong>MySQL server time:</strong> <span id="time">loading...</span>
+      </p>
+      <p>
+        <strong>total page visits:</strong> <span id="visits">loading...</span>
+      </p>
+      <button onclick="logVisit()">log new visit!</button>
+    </div>
+
+    <div class="card">
+      <h2>oulu weather</h2>
+      <p>
+        <strong>current temperature:</strong> <span id="temp">loading...</span>
+      </p>
+      <p>
+        <strong>precipitation:</strong> <span id="precip">loading...</span>
+      </p>
+      <p>
+        <strong>daylight duration:</strong> <span id="daylight">loading...</span>
+      </p>
+      <p>
+        <strong>sunrise:</strong> <span id="sunrise">loading...</span>
+      </p>
+      <p>
+        <strong>sunset:</strong> <span id="sunset">loading...</span>
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>learning diaries</h2>
+      <p style="margin-bottom: 10px;"><a href="diary4.html" style="color: #a88a52; font-weight: bold; text-decoration: none;">learning diary week 4 !</a></p>
+      <p><a href="diary5.html" style="color: #a88a52; font-weight: bold; text-decoration: none;">learning diary week 5 !</a></p>
+    </div>
+
+    <script>
+      async function fetchData() {
+        try {
+          const res = await fetch("/api/data");
+          const data = await res.json();
+          const formattedTime = new Date(data.serverTime).toLocaleString();
+          document.getElementById("time").innerText = formattedTime;
+          document.getElementById("visits").innerText = data.totalVisits;
+        } catch (err) {
+          console.error("error fetching data:", err);
+        }
+      }
+
+      async function fetchWeather() {
+        try {
+          const res = await fetch("/api/weather");
+          const data = await res.json();
+
+          if (data && data.daily) {
+            if (data.daily.sunrise && data.daily.sunrise[0]) {
+              document.getElementById("sunrise").innerText = data.daily.sunrise[0].replace("T", " ");
+            }
+            if (data.daily.sunset && data.daily.sunset[0]) {
+              document.getElementById("sunset").innerText = data.daily.sunset[0].replace("T", " ");
+            }
+            if (data.daily.daylight_duration && data.daily.daylight_duration[0]) {
+              const hours = (data.daily.daylight_duration[0] / 3600).toFixed(1);
+              document.getElementById("daylight").innerText = `${hours} hours`;
+            }
+          }
+
+          if (data && data.hourly) {
+            const temps = data.hourly.temperature_2m || [];
+            const precips = data.hourly.precipitation || [];
+            const currentTemp = temps.find(t => t !== null && t !== undefined) ?? "N/A";
+            const currentPrecip = precips.find(p => p !== null && p !== undefined) ?? 0;
+
+            const tempUnit = (data.hourly_units && data.hourly_units.temperature_2m) ? data.hourly_units.temperature_2m : "°C";
+            const precipUnit = (data.hourly_units && data.hourly_units.precipitation) ? data.hourly_units.precipitation : "mm";
+
+            document.getElementById("temp").innerText = `${currentTemp} ${tempUnit}`;
+            document.getElementById("precip").innerText = `${currentPrecip} ${precipUnit}`;
+          }
+        } catch (err) {
+          console.error("error fetching weather:", err);
+          document.getElementById("temp").innerText = "error loading";
+          document.getElementById("precip").innerText = "error loading";
+          document.getElementById("daylight").innerText = "error loading";
+          document.getElementById("sunrise").innerText = "error loading";
+          document.getElementById("sunset").innerText = "error loading";
+          }
+      }
+
+      async function logVisit() {
+        try {
+          const res = await fetch("/api/visit", { method: "POST" });
+          if (res.ok) {
+            await fetchData(); 
+          }
+        } catch (err) {
+          console.error("error logging visit:", err);
+        }
+      }
+
+      fetchData();
+      fetchWeather();
+    </script>
+  </body>
+</html>

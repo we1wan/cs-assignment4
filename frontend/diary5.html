@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>learning diary</title>
+    <style>
+        body {font-family: "Times New Roman", Times, serif; margin: 40px; line-height: 1.6; max-width: 800px; }
+        .diary {background: #fff9f2; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+        .question {background: #fcf2e8; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+    </style>
+  </head>
+<body>
+    <a href="index.html" style="color: #a88a52; font-weight: bold; text-decoration: none;"> <strong>main page !</strong></a>
+
+    <div class = "question">
+        <h3>Q1 ; saml vs oauth</h3>
+        <p>saml and oauth do two different things even though people get them mixed up. saml is for authentication, which basically means proving who you are. companies use it for single sign-on (sso) so an employee can log in once to something like okta or azure ad and automatically get into all their work tools like gmail or slack without retyping passwords.</p>
+        <p>oauth is for authorization, which means giving an app permission to access your stuff without giving it your password. a normal example of oauth is when a new mobile app asks "can we access your spotify playlist?" and you click allow.</p>
+        <p>a company would pick saml if they want strict it control over employee accounts across all company apps. they would choose oauth when building modern web or mobile apps where users need to connect external accounts or apis safely.</p>
+    </div>
+
+    <div class = "question">
+        <h3>Q2 ; open data portals and data formats</h3>
+        <p>open data portals like avoindata.fi or the european data portal are public sites where governments and organizations post raw datasets for anyone to use or build stuff with. for example, local bus companies upload real-time transit data so developers can make navigation or schedule apps like tuudo.</p>
+        <p>the format you choose for open data matters a lot because bad formats waste everyone's time. if a city uploads bus schedules as a scanned pdf, a developer has to waste hours parsing text or copying data manually before they can even start coding. but if they release it as a clean json or csv file, a developer can just fetch it with a simple api call and use it immediately. machine-readable formats make it actually possible for people to build useful tools out of public data.</p>
+    </div>
+
+    <div class = "question">
+        <h3>Q3 ; decentralized storage vs centralized storage</h3>
+        <p>decentralized storage networks like ipfs or sia split files up and host them across a peer-to-peer network of user nodes, while centralized storage like amazon s3 or csc allas keeps everything on servers owned by a single provider. with something like ipfs, files are found using a unique cryptographic hash of the content itself instead of a web link. that means as long as one person on the network is hosting the file, it stays online.</p>
+        <p>centralized storage like s3 or allas is really fast, reliable, and easy to set up for normal web apps, but you rely totally on one company and their pricing. decentralized storage is great if you want something that can't be taken down by a central authority, but downloads can be slower, and if nodes drop offline, finding files can get tricky.</p>
+    </div>
+
+    <div class = "question">
+        <h3>Q4 ; yaml in kubernetes/rahti vs json</h3>
+        <p>yaml is a simple data format that uses line breaks and indentation instead of code syntax to organize data. it became the default for kubernetes and rahti manifests because it's super easy for humans to read and edit when setting up deployment configs, routes, or services.</p>
+        <p>compared to json, yaml is way cleaner because it doesn't use brackets, braces, or quotes around everything. the biggest advantage yaml has over json for configuration files is that it supports inline comments. you can write notes right next to a line of config explaining what a port or environment variable does, which you can't do in json.</p>
+        <p>while json is still the standard for sending data between apis, yaml is much better for config files where you actually have to read and maintain the code yourself.</p>
+    </div>
+
+    <div class = "diary" style="margin-top: 20px">
+    <h3>learning diary for week 5 !</h3>
+
+    <p>this week i chose the option to integrate a public API into my website. i picked the open-meteo rest api to display real time weather and astronomical data for oulu. on the open-meteo site, i selected the specific weather parameters i wanted to show, which gave me a direct api link that i called on the server using a backend route <i>/api/weather</i> in server.js.</p>
+    <p>on the backend, the <i>/api/weather</i> route performs a fetch() request to the open-meteo endpoint using oulu's coordinates and weather parameters. the backend gets back the raw json data with daily stats (sunrise, sunset, daylight duration) and hourly stats (temperature, precipitation) and sends it straight back to the client as a clean json response.</p>
+    <p>in the csc rahti deployment, browser traffic doesn't speak directly to node.js. instead, requests go to the nginx container listening on port 8080 which acts as a reverse proxy. static frontend files (like index.html and the diary pages) are served directly, while any request sent to /api/ gets forwarded internally across the kubernetes cluster network (backend-service) to port 5000 where express is running.</p>
+    <p>on the frontend, client-side javascript runs a fetchWeather() function when the page loads. the script parses the incoming weather json, converts the daylight duration from seconds into hours, grabs the temperature and precipitation, and updates the HTML elements dynamically. i also added try/catch error handling so if the api lags or takes a second to respond, the page shows fallback text instead of completely breaking.</p>
+    <p>after getting everything working, i pushed all the updated code to github and triggered manual builds in rahti using the buildconfigs. rebuilding the frontend container updated the page layout and scripts, while rebuilding the backend made the new weather route live without breaking the mysql database connection.</p>
+    <p>link to my github repo :3 https://github.com/we1wan/cs-assignment4</p>
+
+    <img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a5-api.png?raw=true" alt="api link" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); "/>
+    <img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a5-api-weather.png?raw=true" alt="weather stats" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); "/>
+    <img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a5-weather.png?raw=true" alt="weather" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); "/>
+    <img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a5-nginx.png?raw=true" alt="nginx" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); "/>
+    <img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a5-rahtiii.png?raw=true" alt="rahti" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); "/>
+
+    </div>
+</body>
+</html>
