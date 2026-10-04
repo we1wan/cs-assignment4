@@ -5,6 +5,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    console.log(
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        method: req.method,
+        path: req.originalUrl,
+        status: res.statusCode,
+        duration_ms: duration,
+      }),
+    );
+  });
+  next();
+});
+
 const db = mysql.createPool({
   host: process.env.DB_HOST || "mysql-service",
   user: process.env.MYSQL_USER,
@@ -12,6 +29,19 @@ const db = mysql.createPool({
   database: process.env.MYSQL_DATABASE || "appdb",
   waitForConnections: true,
   connectionLimit: 10,
+});
+
+app.get("/healthz", (req, res) => {
+  res.status(200).json({ status: "alive" });
+});
+
+app.get("/readyz", (req, res) => {
+  db.query("SELECT 1", (err) => {
+    if (err) {
+      return res.status(500).json({ status: "not ready", error: err.message });
+    }
+    res.status(200).json({ status: "ready" });
+  });
 });
 
 const handleWeather = async (req, res) => {
