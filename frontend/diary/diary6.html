@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>learning diary</title>
+    <style>
+        body {font-family: "Times New Roman", Times, serif; margin: 40px; line-height: 1.6; max-width: 800px; }
+        .diary {background: #fff9f2; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+        .question {background: #fcf2e8; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+    </style>
+  </head>
+<body>
+    <a href="index.html" style="color: #a88a52; font-weight: bold; text-decoration: none;"> <strong>main page !</strong></a>
+
+    <div class = "question">
+        <h3>Q1 ; alert fatigue and designing minimal alerts</h3>
+	    <p>alert fatigue happens when a developer or system admin gets bombarded with so many constant, non-critical, or false alerts that they start ignoring them entirely. when everything is marked as urgent, nothing actually feels urgent. </p>
+	    <p>a real-world example is an engineer getting spammed with 50 automated emails every night about tiny temporary cpu spikes, so when a critical database crash alert actually happens, they sleep through it because they muted the entire channel.</p>
+	    <p>to avoid alert fatigue in a small student projects, we should only set up alerts for high-severity problems that require actual human action to fix, rather than logging every little status update. for example, instead of alerting when a single server request fails or when cpu hits 60% for five seconds, we should group and set thresholds: alert only if the entire app is returning 500 server errors for more than 5 minutes straight, or if the main database is completely unreachable. for a simple project stack running on something like docker or rahti, a minimal set of three alerts would be: a ping check that alerts if the frontend web server goes down completely, an error rate threshold that triggers if more than 5% of requests fail in a 10-minute window, and a storage warning if disk space hits 90%. keeping it to actionable, high-priority thresholds ensures we only get notified when our app actually needs immediate fixing.</p>
+    </div>
+
+    <div class = "question">
+        <h3> Q2 ; liveness probe vs readiness probe in kubernetes/rahti</h3>
+        <p>liveness and readiness probes are automated health checks used by kubernetes and rahti to keep containerized apps running properly. even though both check if a container is doing okay, they serve two very different purposes. a liveness probe checks if your app container is actually running or if it has frozen/deadlocked, while a readiness probe checks if your app is fully ready to accept incoming user traffic.
+        <p>a simple example of the difference is when a web app first starts up: it might take 30 seconds to load database connections and cache files into memory. during those 30 seconds, the app is alive but not ready. the readiness probe stays negative so kubernetes doesn't route user web requests to a container that isn't ready to answer them yet. the biggest difference would be what happenes when they fail. if a liveness probe fails, kubernetes assumes the app is stuck forever and automatically kills and restarts the container. if a readiness probe fails, kubernetes doesn't kill the container; it just temporarily removes it from the service load balancer so no users hit it until it recovers and becomes ready again.</p>
+    </div>
+
+    <div class = "question">
+        <h3>Q3 ; the three pillars of observability</h3>
+        <p>observability is all about understanding what's happening inside a system based on the data it produces. each pillar gives a different perspective on system health.</p>
+        <p>metrics are numeric values aggregated over time that show overall performance trends. they are best suited to answer high-level operational questions like "what is our current server CPU usage and request error rate?" they give you quick dashboards and alerts when something starts performing poorly across the whole app.</p>
+        <p>logs are detailed text records of individual events that happened. they are best suited to answer specific event questions like "why did user #402 get a 500 server error at 10:15 am?" because you can look at the exact error message and stack trace printed by the code at that moment.</p>
+        <p>traces track a single request's journey as it passes through multiple microservices. they are best suited to answer distributed performance questions like "which specific database query or microservice API call is causing checkout requests to take 6 seconds?" because a trace breaks down the exact time spent at every step of that user's request path.</p>    
+    </div>
+
+    <div class = "question">
+        <h3>Q4 ; continuous integration vs continuous delivery vs continuous deployment</h3>
+        <p>continuous integration (ci), continuous delivery, and continuous deployment are progressive stages in automated software releasing.</p>
+        <p>continuous integration focuses purely on code quality early on, like whenever developers push code updates to a shared repository like github, automated tools build the app and run tests to catch bugs before merging code together.</p>
+        <p>continuous delivery and continuous deployment take automation further into testing and production environments. every code change that passes ci tests is automatically built and packaged into a release artifact, then automatically deployed to a staging environment ready for production. however, deploying to live users still requires a manual button push or human approval from a team lead.</p>
+        <p>continuous deployment completely eliminates that manual human gate. every single code change that passes the automated pipeline is pushed directly to live production servers without human intervention. a company uses continuous delivery when they need business or compliance sign-offs before going live, whereas fast-moving teams use continuous deployment so bug fixes and small features hit live users within minutes of passing tests.</p>
+    </div>
+
+    <div class = "diary" style="margin-top: 20px">
+    <h3>learning diary for week 5 !</h3>
+
+    <p>this week i chose the option to integrate a public API into my website. i picked the open-meteo rest api to display real time weather and astronomical data for oulu. on the open-meteo site, i selected the specific weather parameters i wanted to show, which gave me a direct api link that i called on the server using a backend route <i>/api/weather</i> in server.js.</p>
+    <p>on the backend, the <i>/api/weather</i> route performs a fetch() request to the open-meteo endpoint using oulu's coordinates and weather parameters. the backend gets back the raw json data with daily stats (sunrise, sunset, daylight duration) and hourly stats (temperature, precipitation) and sends it straight back to the client as a clean json response.</p>
+    <p>in the csc rahti deployment, browser traffic doesn't speak directly to node.js. instead, requests go to the nginx container listening on port 8080 which acts as a reverse proxy. static frontend files (like index.html and the diary pages) are served directly, while any request sent to /api/ gets forwarded internally across the kubernetes cluster network (backend-service) to port 5000 where express is running.</p>
+    <p>on the frontend, client-side javascript runs a fetchWeather() function when the page loads. the script parses the incoming weather json, converts the daylight duration from seconds into hours, grabs the temperature and precipitation, and updates the HTML elements dynamically. i also added try/catch error handling so if the api lags or takes a second to respond, the page shows fallback text instead of completely breaking.</p>
+    <p>after getting everything working, i pushed all the updated code to github and triggered manual builds in rahti using the buildconfigs. rebuilding the frontend container updated the page layout and scripts, while rebuilding the backend made the new weather route live without breaking the mysql database connection.</p>
+    <p>link to my github repo :3 https://github.com/we1wan/cs-assignment4</p>
+
+    <img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a6-workflow.png?raw=true" alt="api link" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); "/>
+    <img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a6-logs.png?raw=true" alt="weather stats" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); "/>
+    <img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a6-probes.png?raw=true" alt="weather" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); "/>
+    </div>
+</body>
+</html>
