@@ -37,9 +37,8 @@
       <h3>Q1 ; alert fatigue and designing minimal alerts</h3>
       <p>
         alert fatigue happens when a developer or system admin gets bombarded
-        with so many constant, non-critical, or false alerts that they start
-        ignoring them entirely. when everything is marked as urgent, nothing
-        actually feels urgent.
+        with so many constant, not-urgent, or false alerts that they start
+        ignoring them.
       </p>
       <p>
         a real-world example is an engineer getting spammed with 50 automated
@@ -49,17 +48,17 @@
       </p>
       <p>
         to avoid alert fatigue in a small student projects, we should only set
-        up alerts for high-severity problems that require actual human action to
+        up alerts for important problems that require actual human action to
         fix, rather than logging every little status update. for example,
         instead of alerting when a single server request fails or when cpu hits
-        60% for five seconds, we should group and set thresholds: alert only if
+        higher percentage for five seconds, we should group and set thresholds: alert only if
         the entire app is returning 500 server errors for more than 5 minutes
         straight, or if the main database is completely unreachable. for a
         simple project stack running on something like docker or rahti, a
         minimal set of three alerts would be: a ping check that alerts if the
         frontend web server goes down completely, an error rate threshold that
-        triggers if more than 5% of requests fail in a 10-minute window, and a
-        storage warning if disk space hits 90%. keeping it to actionable,
+        triggers if some amount of requests fail in a 10-minute window, and a
+        storage warning if disk space hits lets say 90%. keeping it to actionable,
         high-priority thresholds ensures we only get notified when our app
         actually needs immediate fixing.
       </p>
@@ -76,7 +75,7 @@
         checks if your app is fully ready to accept incoming user traffic.
       </p>
       <p>
-        a simple example of the difference is when a web app first starts up: it
+        a simple example of the difference is when a web app first starts up. it
         might take 30 seconds to load database connections and cache files into
         memory. during those 30 seconds, the app is alive but not ready. the
         readiness probe stays negative so kubernetes doesn't route user web
@@ -225,6 +224,7 @@
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         "
       />
+      <p>link to my github repo :3 https://github.com/we1wan/cs-assignment4</p>
     </div>
   </body>
 </html>
