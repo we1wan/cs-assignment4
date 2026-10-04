@@ -41,11 +41,14 @@
     </style>
   </head>
   <body>
-    <div class = "diary"> 
+    <div class="diary">
       <h3>note !</h3>
-      <p>the page visits sometimes show zero and weather data may show error loading so pls just refresh the page! i'll try to fix it asap :)</p>
+      <p>
+        the page visits sometimes show zero and weather data may show error
+        loading so pls just refresh the page! i'll try to fix it asap :)
+      </p>
     </div>
-    
+
     <div class="card">
       <h2>stats</h2>
       <p>
@@ -62,26 +65,38 @@
       <p>
         <strong>current temperature:</strong> <span id="temp">loading...</span>
       </p>
+      <p><strong>precipitation:</strong> <span id="precip">loading...</span></p>
       <p>
-        <strong>precipitation:</strong> <span id="precip">loading...</span>
+        <strong>daylight duration:</strong>
+        <span id="daylight">loading...</span>
       </p>
-      <p>
-        <strong>daylight duration:</strong> <span id="daylight">loading...</span>
-      </p>
-      <p>
-        <strong>sunrise:</strong> <span id="sunrise">loading...</span>
-      </p>
-      <p>
-        <strong>sunset:</strong> <span id="sunset">loading...</span>
-      </p>
+      <p><strong>sunrise:</strong> <span id="sunrise">loading...</span></p>
+      <p><strong>sunset:</strong> <span id="sunset">loading...</span></p>
     </div>
 
     <div class="card">
       <h2>learning diaries</h2>
-      <p style="margin-bottom: 10px;">
-      <a href="diary/diary4.html" style="color: #a88a52; font-weight: bold; text-decoration: none;">learning diary week 4 !</a></p>
-      <p><a href="diary/diary5.html" style="color: #a88a52; font-weight: bold; text-decoration: none;">learning diary week 5 !</a></p>
-      <p><a href="diary/diary6.html" style="color: #a88a52; font-weight: bold; text-decoration: none;">learning diary week 6 !</a></p>
+      <p style="margin-bottom: 10px">
+        <a
+          href="diary4.html"
+          style="color: #a88a52; font-weight: bold; text-decoration: none"
+          >learning diary week 4 !</a
+        >
+      </p>
+      <p>
+        <a
+          href="diary5.html"
+          style="color: #a88a52; font-weight: bold; text-decoration: none"
+          >learning diary week 5 !</a
+        >
+      </p>
+      <p>
+        <a
+          href="diary6.html"
+          style="color: #a88a52; font-weight: bold; text-decoration: none"
+          >learning diary week 6 !</a
+        >
+      </p>
     </div>
 
     <script>
@@ -104,12 +119,17 @@
 
           if (data && data.daily) {
             if (data.daily.sunrise && data.daily.sunrise[0]) {
-              document.getElementById("sunrise").innerText = data.daily.sunrise[0].replace("T", " ");
+              document.getElementById("sunrise").innerText =
+                data.daily.sunrise[0].replace("T", " ");
             }
             if (data.daily.sunset && data.daily.sunset[0]) {
-              document.getElementById("sunset").innerText = data.daily.sunset[0].replace("T", " ");
+              document.getElementById("sunset").innerText =
+                data.daily.sunset[0].replace("T", " ");
             }
-            if (data.daily.daylight_duration && data.daily.daylight_duration[0]) {
+            if (
+              data.daily.daylight_duration &&
+              data.daily.daylight_duration[0]
+            ) {
               const hours = (data.daily.daylight_duration[0] / 3600).toFixed(1);
               document.getElementById("daylight").innerText = `${hours} hours`;
             }
@@ -118,14 +138,24 @@
           if (data && data.hourly) {
             const temps = data.hourly.temperature_2m || [];
             const precips = data.hourly.precipitation || [];
-            const currentTemp = temps.find(t => t !== null && t !== undefined) ?? "N/A";
-            const currentPrecip = precips.find(p => p !== null && p !== undefined) ?? 0;
+            const currentTemp =
+              temps.find((t) => t !== null && t !== undefined) ?? "N/A";
+            const currentPrecip =
+              precips.find((p) => p !== null && p !== undefined) ?? 0;
 
-            const tempUnit = (data.hourly_units && data.hourly_units.temperature_2m) ? data.hourly_units.temperature_2m : "°C";
-            const precipUnit = (data.hourly_units && data.hourly_units.precipitation) ? data.hourly_units.precipitation : "mm";
+            const tempUnit =
+              data.hourly_units && data.hourly_units.temperature_2m
+                ? data.hourly_units.temperature_2m
+                : "°C";
+            const precipUnit =
+              data.hourly_units && data.hourly_units.precipitation
+                ? data.hourly_units.precipitation
+                : "mm";
 
-            document.getElementById("temp").innerText = `${currentTemp} ${tempUnit}`;
-            document.getElementById("precip").innerText = `${currentPrecip} ${precipUnit}`;
+            document.getElementById("temp").innerText =
+              `${currentTemp} ${tempUnit}`;
+            document.getElementById("precip").innerText =
+              `${currentPrecip} ${precipUnit}`;
           }
         } catch (err) {
           console.error("error fetching weather:", err);
@@ -134,14 +164,14 @@
           document.getElementById("daylight").innerText = "error loading";
           document.getElementById("sunrise").innerText = "error loading";
           document.getElementById("sunset").innerText = "error loading";
-          }
+        }
       }
 
       async function logVisit() {
         try {
           const res = await fetch("/api/visit", { method: "POST" });
           if (res.ok) {
-            await fetchData(); 
+            await fetchData();
           }
         } catch (err) {
           console.error("error logging visit:", err);
