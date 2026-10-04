@@ -32,7 +32,7 @@ const db = mysql.createPool({
 });
 
 app.get("/healthz", (req, res) => {
-  res.status(500).json({ status: "failing on purpose" });
+  res.status(200).json({ status: "alive" });
 });
 
 app.get("/readyz", (req, res) => {
