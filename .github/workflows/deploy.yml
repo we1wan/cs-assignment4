@@ -27,11 +27,13 @@ jobs:
       - name: push image to GHCR
         run: docker push "$IMAGE"
 
+      - name: install oc client
+        uses: redhat-actions/oc-installer@v1
+        with:
+          oc_version: 'latest'
+
       - name: deploy image update to Rahti
         run: |
-          wget --no-config --header="Authorization:" https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz
-          tar -xzf openshift-client-linux.tar.gz oc
-          sudo mv oc /usr/local/bin/
           oc login --token=${{ secrets.RAHTI_TOKEN }} --server=${{ secrets.RAHTI_SERVER }}
           oc project cs-assignment4
           oc set image deployment/backend-deployment backend="$IMAGE"
