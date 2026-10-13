@@ -29,7 +29,7 @@ jobs:
 
       - name: deploy image update to Rahti
         run: |
-          wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz
+          wget --no-config --header="Authorization:" https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz
           tar -xzf openshift-client-linux.tar.gz oc
           sudo mv oc /usr/local/bin/
           oc login --token=${{ secrets.RAHTI_TOKEN }} --server=${{ secrets.RAHTI_SERVER }}
