@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>learning diary</title>
+    <style>
+      body {
+        font-family: "Times New Roman", Times, serif;
+        margin: 40px;
+        line-height: 1.6;
+        max-width: 800px;
+      }
+      .diary {
+        background: #fff9f2;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+      }
+      .question {
+        background: #fcf2e8;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <a
+      href="index.html"
+      style="color: #a88a52; font-weight: bold; text-decoration: none"
+    >
+      <strong>main page !</strong></a
+    >
+
+    <div class="question">
+<h3> Q1 ; opentofu history and comparison</h3>
+<p>opentofu was created in 2023 as an open source fork of terraform after hashicorp changed terraform's license from the open source bsl/mpl to the restrictive business source license (bsl). for an individual developer, the choice between them rarely matters because the syntax, HCL language, and core commands remain practically identical. however, for a company, the choice is critical because the BSL license restricts commercial usage and building competing products, while opentofu is fully open source under the linux foundation, guaranteeing vendor neutrality and preventing licensing lock-in.</p>
+</div>
+
+<div class="question">
+<h3> Q2 ; configuration drift</h3>
+<p>configuration drift happens when the actual state of live cloud infrastructure deviates from the desired state defined in our code, usually due to manual edits in the web console, emergency hotfixes, or outside scripts. an iac tool detects drift by executing a refresh phase during tofu plan or tofu apply, where it queries the cloud provider APIs to fetch the real-world resource states and compares them against the stored state file, highlighting any discrepancies.</p>
+</div>
+
+<div class="question">
+<h3> Q3 ; declarative vs imperative infrastructure automation</h3>
+<p>declarative automation focuses on defining the final desired state of the infrastructure, leaving the tool to figure out the exact steps needed to achieve it. imperative automation focuses on defining explicit step-by-step commands that must run in sequence.</p>
+<p>idempotency means that running the same automation code multiple times produces the exact same result without causing unintended side effects or creating duplicate resources. it is important because it makes deployments predictable, repeatable, and safe to execute at any time.</p>
+</div>
+
+<div class="question">
+<h3> Q4 ; provisioning vs config management</h3>
+<p>provisioning focuses on creating and setting up the underlying infrastructure resources themselves, such as virtual machines, networks, floating ips, and security groups. configuration management focuses on installing software, managing system settings, and maintaining state inside an operating system after it is already running.</p>
+<p> cloud-init bridges the gap as a lightweight boot-time tool to run initial scripts and basic package setup during VM creation, whereas ansible is a full configuration management tool used for complex, ongoing software provisioning, orchestration, and server maintenance across multiple machines.</p>
+</div>
+
+
+    <div class="diary" style="margin-top: 20px">
+      <h3>learning diary for week 7 !</h3>
+
+      <p>this week i rebuilt my week 1 web server setup on csc c pouta using opentofu instead of doing everything manually in the web console. the goal was to define the whole infrastructure as code so that the server, network settings, and web content can be created, updated, or completely removed using simple commands.</p>
+
+<p>my opentofu configuration is split across main.tf, variables.tf, and outputs.tf, defining 7 core resources on c pouta: an ed25519 ssh keypair, a web-secgroup security group with ssh and http rules, an ubuntu 22.04 instance running cloud-init to setup nginx with "vanesa vigasova - week 7 server", a floating ip address, and its association to the vm.</p>
+
+<p>input variables were used for my ssh public key and my personal ip address, while outputs export the final public ip and web server url upon deployment.</p>
+
+<img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a7-tofuapply.png?raw=true" alt="first apply" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);"/>
+
+<p>after running tofu apply, all 7 resources were created successfully. opening the floating ip address in my browser loaded my custom web page as configured by cloud-init.</p>
+
+<img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a7-server.png?raw=true" alt="original ip" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);"/>
+
+<img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a7-instances.png?raw=true" alt="instances in cpouta" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);"/>
+
+<h5>experiment 1: destroy and rebuild</h5>
+
+<p>to test how repeatable the setup is, i ran tofu destroy followed by tofu apply. opentofu cleanly tore down all resources without leaving anything behind on c pouta.</p>
+
+<img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a7-tofudestroy.png?raw=true" alt="detroying" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);"/>
+
+<p>running tofu apply again built the entire server stack from scratch in roughly two minutes. the only difference was that c pouta assigned a new floating ip address, but the server and web content came back up automatically without needing any manual configuration.</p>
+
+<img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a7-tofureapply.png?raw=true" alt="reapply" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);"/>
+
+<img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a7-server2.png?raw=true" alt="different ip" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);"/>
+
+<h5>experiment 2: change and drift detection</h5>
+
+<p>for experiment 2, i added a new icmp (ping) security group rule to main.tf to see how opentofu handles code updates. running tofu plan showed "plan: 1 to add, 0 to change, 0 to destroy", confirming an in-place update that adds the rule without replacing or destroying the virtual machine.</p>
+
+<img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a7-tofuplann.png?raw=true" alt="plan" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);"/>
+
+<p>after applying the rule, i logged into the c pouta web dashboard and manually deleted the icmp rule to test drift detection. when i ran tofu plan again, opentofu recognized that the real-world state no longer matched the code and planned to recreate the deleted rule to fix the drift.</p>
+
+<img src="https://github.com/we1wan/cs-assignment4/blob/main/img/a7-plan.png?raw=true" alt="plan" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);"/>
+
+<h5>reflection: manual setup (week 1) vs. infrastructure as code (week 7)</h5>
+
+<p>in week 1, setting up the web server required going through multiple web forms, manually entering security rules, creating floating ips, and using ssh to install nginx and upload files. while easy to understand at first, doing it by hand is slow, easy to mess up, and hard to repeat exactly. 
+
+using opentofu takes a bit more time to set up the code initially, but it makes everything reproducible, fast, and documented. an entire infrastructure stack can be destroyed and brought back up in minutes, changes can be reviewed beforehand with tofu plan, and everything is tracked safely in code.</p>
+
+<p>problems encountered and solutions; 
+
+i ran into an issue where tofu apply failed because my openstack password variable was not set properly in my environment. once i set the correct os_password environment variable in powershell using secure string input, opentofu authenticated with c pouta without any issues.</p>
+
+<p>security practices; 
+
+to protect sensitive data, i added all state files (*.tfstate), credential files (openrc.sh), local variable files (.tfvars), and private ssh keys to .gitignore so they are never committed to git.</p>
+      <p>link to my github repo :3 https://github.com/we1wan/cs-assignment4</p>
+    </div>
+  </body>
+</html>
